@@ -1,0 +1,300 @@
+#!/bin/bash
+#0 positive
+#1 negtive
+#2 dontknow
+
+
+function absolute_path {
+    (cd "$(dirname "$1")" && pwd)
+}   #get the absolute path of $1 file
+
+function print_title {
+    cat <<EOF
+PETRINIZER: The checker for Petri Nets
+[$1]
+EOF
+}
+
+function print_usage {
+    cat <<EOF
+
+Usage: $0 [options] input_file
+Option list:
+ -safety | --safety                   : Method Safety, default
+ -safety-int | --safety-int           : Method Safety over integers
+ -refinement | --refinement           : Method Safety by Refinement over Real
+ -refinement-int | --refinement-int   : Method Safety by Refinement over integers
+ -benchmark | --benchmark             : Print information for benchmark
+ -h | --h | -help | --help            : Prints this help
+ -v | --v                             : Verbose output
+
+EOF
+}
+
+function vecho {
+    if [ -n "$verbose" ]; then
+        echo "$1"
+    fi
+}
+
+
+# **********************************************************************
+# Entry point
+
+# Method Safety default real
+refinement_methods=( )
+equation_type='Real'
+
+benchmark=false
+
+
+echo "para: $@"
+# parse parameters
+for a in $@; do
+    case $a in
+        -h | --h | -help | --help)
+            print_usage
+            exit 0
+            ;;
+        -v | --v)
+            verbose=true
+            ;;
+        -safety | --safety)
+            # Method Safety, see above
+            ;;
+        -safety-int | --safety-int)
+            # Method Safety over integers
+            equation_type='Int'
+            ;;
+        -refinement | --refinement)
+            # Method Safety by Refinement
+            refinement_methods=( 'trap' )
+            equation_type='Real'
+            ;;
+        -refinement-int | --refinement-int)
+            # Method Safety by Refinement over integers
+            refinement_methods=( 'trap' )
+            equation_type='Int'
+            ;;
+        -benchmark | --benchmark)
+            # Output information for benchmarks
+            benchmark=true
+            ;;
+        -*)
+            echo 'ERROR: Unknown option '$a
+            exit 3
+            ;;
+        *)
+            input=$a
+    esac
+done
+
+if ! $benchmark; then
+  print_title "$*"
+fi
+
+if [ -z $input ]; then
+    echo 'ERROR: No input file was given'
+    exit 3
+fi
+
+if [ ! -e $input ]; then
+    echo "ERROR: The file $input does not exist"
+    exit 3
+fi
+
+sysdir=$(absolute_path $0)
+
+tmpdir=/tmp/pnerf-$(date +%s%N)
+mkdir $tmpdir
+
+#tmpdir=/home/drj/BPP/pnerf/tests/random-test/1
+
+set -e
+set -o pipefail
+
+function exit_with {
+  result=$1   #运行结果
+  iter=$2 #迭代次数
+  if $benchmark; then
+          echo -n "Result;"
+          echo -n "Iterations;"
+          echo -n
+          if [[ $result -eq 0 ]]; then
+                echo -n "+;"
+          else
+                echo -n "-;"
+          fi
+          echo
+  else
+        echo $iter
+        echo '-------------------------------------------' 
+        # find the invariants
+        if [[ $result -eq 0 ]]; then
+            echo 'The petri net satisfies the property!'
+       else
+            echo 'The petri net do not satisfy the property'
+        fi
+        echo '-------------------------------------------'
+        echo
+        echo
+  fi
+  set +o pipefail
+  set +e
+  rm -r $tmpdir
+  exit $result
+}
+
+
+function run_z3 {
+  z3_input=$1
+  z3_output=$2
+  if [ -z "$verbose" ]; then
+    z3 -smt2 $z3_input 2>/dev/null >$z3_output
+    res=$?
+  else
+    z3 -smt2 $z3_input 2>/dev/null | tee $z3_output
+    res=$?
+  fi
+  return $res
+}
+
+function run_sicstus {
+  prolog_file=$1
+  pl_output=$2
+  pl_input=${@:3}
+  if [ -z "$verbose" ]; then
+    sicstus -l "$sysdir"/$prolog_file -- $pl_input  2>/dev/null >$pl_output
+    res=$?
+  else
+    sicstus -l "$sysdir"/$prolog_file -- $pl_input   2>/dev/null| tee $pl_output
+    res=$?
+  fi
+  return $res
+}
+
+function run_bash {
+  bash_file=$1
+  bash_output=$2
+  bash_input=${@:3}
+  if [ -z "$verbose" ]; then
+    $bash_file $bash_input >$bash_output
+    res=$?
+  else
+    $bash_file $bash_input | tee $bash_output
+    res=$?
+  fi
+  return $res
+}
+
+cp $(absolute_path $input)/$(basename $input) $tmpdir/input-petri-net.pl
+
+
+function Safety(){
+          #----------safety-------------
+            vecho
+            vecho '* Constructing petri net N from input file'
+            run_sicstus input-file-to-petri-net.pl $tmpdir/pp-petri-net.pl 0 $tmpdir/input-petri-net.pl
+            vecho
+            vecho '* Constructing constraints C_0 for petri net N'
+            run_sicstus petri-net-to-constraints.pl $tmpdir/constraints-c.smt2 $equation_type $tmpdir/pp-petri-net.pl
+
+          iter=1
+          while(
+                vecho
+                vecho "* Iteration $iter"
+                vecho
+                vecho "* Checking SAT(C_$iter)"
+                run_z3 $tmpdir/constraints-c.smt2 $tmpdir/model-a.smt2
+          ); do
+               vecho
+               vecho "- sat, getting model A for C_$iter"
+               run_bash "$sysdir"/smt2-model-to-prolog-model.sh $tmpdir/model-a.pl $tmpdir/model-a.smt2 
+               vecho "- generate subnet_$iter for A and C_$iter"
+               run_sicstus  generate-subnet.pl    $tmpdir/subnet.pl  $tmpdir/pp-petri-net.pl   $tmpdir/model-a.pl
+               vecho "check markable of  subnet_$iter for A and C_$iter"
+               if(run_sicstus subnet-markable.pl  $tmpdir/subnet-markable.out  $tmpdir/subnet.pl);then
+               	vecho "subnet_$iter markable"
+               	exit_with 1 $iter 0 0
+               else
+               	vecho "- constructing subnet constraint sn-delta for petri net N and model A"
+                       run_sicstus subnet-delta-constraints.pl $tmpdir/constraint-sn-delta.smt2 $tmpdir/pp-petri-net.pl $tmpdir/model-a.pl
+               	vecho "- constructing constraints C_$((iter+1)) for C_$iter and sn-delta"
+                       run_bash "$sysdir"/succ-constraints.sh $tmpdir/constraints-cn.smt2 $tmpdir/constraints-c.smt2 $tmpdir/constraint-sn-delta.smt2
+                       mv $tmpdir/constraints-cn.smt2 $tmpdir/constraints-c.smt2          
+               fi
+               iter=$((iter+1))
+          done
+          exit_with 0 $iter 0 0
+}
+
+
+
+function Refinement(){
+      #-----------refinement---------------
+      vecho
+      vecho '* Constructing petri net N from input file'
+      run_sicstus input-file-to-petri-net.pl $tmpdir/pp-petri-net.pl 0 $tmpdir/input-petri-net.pl
+      vecho
+      vecho '* Constructing constraints C_0 for petri net N'
+      run_sicstus petri-net-to-constraints.pl $tmpdir/constraints-c.smt2 $equation_type $tmpdir/pp-petri-net.pl
+
+      iter=1
+      while
+          (
+            vecho
+            vecho "* Iteration $iter"
+            vecho
+            vecho "* Checking SAT(C_$iter)"
+            run_z3 $tmpdir/constraints-c.smt2 $tmpdir/model-a.smt2
+          ); do
+
+           vecho
+           vecho "- sat, getting model A for C_$iter"
+           run_bash "$sysdir"/smt2-model-to-prolog-model.sh $tmpdir/model-a.pl $tmpdir/model-a.smt2 
+           
+           
+           
+           vecho "- generate subnet_$iter for A and C_$iter"
+           run_sicstus  generate-subnet.pl    $tmpdir/subnet.pl  $tmpdir/pp-petri-net.pl   $tmpdir/model-a.pl
+           vecho "check markable of  subnet_$iter for A and C_$iter"
+           if(run_sicstus subnet-markable.pl  $tmpdir/subnet-markable.out  $tmpdir/subnet.pl);then
+                  vecho "subnet_$iter markable"
+                  exit_with 1 $iter 0 0  #reachable   SATISFY
+           else
+
+                  #---------------------------construct subnet constraints------------------------
+                  vecho "- constructing subnet constraint sn_delta for petri net N and model A"
+                         run_sicstus subnet-delta-constraints.pl $tmpdir/constraint-sn-delta.smt2 $tmpdir/pp-petri-net.pl $tmpdir/model-a.pl
+                  vecho "- constructing constraints C_$((iter+1)) for C_$iter and sn_delta"
+                         run_bash "$sysdir"/succ-constraints.sh $tmpdir/constraints-cn.smt2 $tmpdir/constraints-c.smt2 $tmpdir/constraint-sn-delta.smt2
+                         mv $tmpdir/constraints-cn.smt2 $tmpdir/constraints-c.smt2    #C=C+sn_delta
+                    #---------------------------construct trap constraints----------------------
+                      vecho "- constructing trap constraints C_theta for petri net N and model A"
+                      run_sicstus refinement-methods/trap-constraints.pl $tmpdir/constraints-ctheta.smt2 $tmpdir/pp-petri-net.pl $tmpdir/model-a.pl
+                      if ( run_z3 $tmpdir/constraints-ctheta.smt2 $tmpdir/model-atheta.smt2 ); then
+                            vecho "- sat, getting model A_theta for C_theta"
+                            run_bash "$sysdir"/smt2-model-to-prolog-model.sh $tmpdir/model-atheta.pl $tmpdir/model-atheta.smt2 
+                            vecho "- constructing trap constraint trap_delta for petri net N and model A_theta"
+                            run_sicstus refinement-methods/trap-delta-constraint.pl $tmpdir/constraint-trap-delta.smt2 $tmpdir/pp-petri-net.pl $tmpdir/model-atheta.pl
+                            vecho "- constructing constraints C_$((iter+1)) for C_$iter and trap_delta"
+                            run_bash "$sysdir"/succ-constraints.sh $tmpdir/constraints-cn.smt2 $tmpdir/constraints-c.smt2 $tmpdir/constraint-trap-delta.smt2
+                            mv $tmpdir/constraints-cn.smt2 $tmpdir/constraints-c.smt2    #change the filename    C=C+delta
+                            iter=2333
+
+                      fi
+           fi
+           iter=$((iter+1))
+      done
+      exit_with 0 $iter 0 0
+}
+
+
+method_count=${#refinement_methods[@]} 
+if [[ $method_count -gt 0 ]]; then
+       Refinement
+else
+       Safety
+fi
+
+

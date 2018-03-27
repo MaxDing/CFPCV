@@ -1,0 +1,6 @@
+.*.swp
+*-dot2tex-fig*
+*.aux
+*.log
+*.toc
+*.pdf

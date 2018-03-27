@@ -1,0 +1,189 @@
+\begin{thebibliography}{10}
+
+\bibitem{Slam}
+T.~Ball and S.~K. Rajamani.
+\newblock The {SLAM} project: debugging system software via static analysis.
+\newblock In {\em POPL}, 2002.
+
+\bibitem{SepLogTerm}
+J.~Berdine, B.~Cook, D.~Distefano, and P.~W. O'Hearn.
+\newblock Automatic termination proofs for programs with shape-shifting heaps.
+\newblock In {\em CAV}, 2006.
+
+\bibitem{YangESOP08}
+A.~Chawdhary, B.~Cook, S.~Gulwani, M.~Sagiv, and H.~Yang.
+\newblock Ranking abstractions.
+\newblock In {\em ESOP}, 2008.
+
+\bibitem{copytrick}
+B.~Cook, A.~Podelski, and A.~Rybalchenko.
+\newblock Termination proofs for systems code.
+\newblock In {\em PLDI}, 2006.
+
+\bibitem{CACM}
+B.~Cook, A.~Podelski, and A.~Rybalchenko.
+\newblock Proving program termination.
+\newblock {\em Commun. ACM}, 54(5), 2011.
+
+\bibitem{CousotHigherOrder94}
+P.~Cousot and R.~Cousot.
+\newblock Invited talk: Higher order abstract interpretation (and application
+  to comportment analysis generalizing strictness, termination, projection, and
+  per analysis.
+\newblock In {\em ICCL}, 1994.
+
+\bibitem{CousotPOPL12}
+P.~Cousot and R.~Cousot.
+\newblock An abstract interpretation framework for termination.
+\newblock In {\em POPL}, 2012.
+
+\bibitem{MightSCHEME2010}
+C.~Earl, M.~Might, and D.~V. Horn.
+\newblock Pushdown control-flow analysis of higher-order programs: Precise,
+  polyvariant and polynomial-time.
+\newblock In {\em Scheme}, 2010.
+
+\bibitem{GieslHaskell}
+J.~Giesl, M.~Raffelsieper, P.~Schneider-Kamp, S.~Swiderski, and R.~Thiemann.
+\newblock Automated termination proofs for haskell by term rewriting.
+\newblock {\em ACM Trans. Program. Lang. Syst.}, 33, 2011.
+
+\bibitem{PodelskiSAS10}
+M.~Heizmann, N.~D. Jones, and A.~Podelski.
+\newblock Size-change termination and transition invariants.
+\newblock In {\em SAS}, 2010.
+
+\bibitem{Blast}
+T.~A. Henzinger, R.~Jhala, R.~Majumdar, and G.~Sutre.
+\newblock Lazy abstraction.
+\newblock In {\em POPL}, 2002.
+
+\bibitem{fsoft}
+F.~Ivancic, Z.~Yang, M.~K. Ganai, A.~Gupta, I.~Shlyakhter, and P.~Ashar.
+\newblock F-soft: Software verification platform.
+\newblock In {\em CAV}, 2005.
+
+\bibitem{RupakRanjit}
+R.~Jhala and R.~Majumdar.
+\newblock Counterexample refinement for functional programs.
+\newblock available from
+  http://www.cs.ucla.edu/\~{}rupak/Papers/CEGARFunctional.ps, 2009.
+
+\bibitem{HMC}
+R.~Jhala, R.~Majumdar, and A.~Rybalchenko.
+\newblock {HMC}: Verifying functional programs using abstract interpreters.
+\newblock In {\em CAV}, 2011.
+
+\bibitem{JonesBohr04}
+N.~D. Jones and N.~Bohr.
+\newblock Termination analysis of the untyped lamba-calculus.
+\newblock In {\em RTA}, 2004.
+
+\bibitem{Dsolve}
+M.~Kawaguchi, P.~M. Rondon, and R.~Jhala.
+\newblock Type-based data structure verification.
+\newblock In {\em PLDI}, 2009.
+
+\bibitem{DsolveCAV}
+M.~Kawaguchi, P.~M. Rondon, and R.~Jhala.
+\newblock Dsolve: Safety verification via liquid types.
+\newblock In {\em CAV}, 2010.
+
+\bibitem{KobayashiPLDI11}
+N.~Kobayashi, R.~Sato, and H.~Unno.
+\newblock Predicate abstraction and {CEGAR} for higher-order model checking.
+\newblock In {\em PLDI}, 2011.
+
+\bibitem{KroeningCAV10}
+D.~Kroening, N.~Sharygina, A.~Tsitovich, and C.~M. Wintersteiger.
+\newblock Termination analysis with compositional transition invariants.
+\newblock In {\em CAV}, 2010.
+
+\bibitem{SCTPOPL2001}
+C.~S. Lee, N.~D. Jones, and A.~M. Ben-Amram.
+\newblock The size-change principle for program termination.
+\newblock In {\em POPL}, 2001.
+
+\bibitem{LeroyPhD92}
+X.~Leroy.
+\newblock Polymorphic typing of an algorithmic language.
+\newblock Research report 1778, INRIA, 1992.
+
+\bibitem{Impact}
+K.~L. McMillan.
+\newblock Lazy abstraction with interpolants.
+\newblock In {\em CAV}, 2006.
+
+\bibitem{MightJFP08}
+M.~Might and O.~Shivers.
+\newblock Exploiting reachability and cardinality in higher-order flow
+  analysis.
+\newblock {\em J.\ Funct. Program.}, 18(5-6), 2008.
+
+\bibitem{GieslBytecode}
+C.~Otto, M.~Brockschmidt, C.~von Essen, and J.~Giesl.
+\newblock Automated termination analysis of java bytecode by term rewriting.
+\newblock In {\em RTA}, 2010.
+
+\bibitem{transitioninvariants}
+A.~Podelski and A.~Rybalchenko.
+\newblock Transition invariants.
+\newblock In {\em LICS}, 2004.
+
+\bibitem{Camlp4-dist}
+N.~Pouillard.
+\newblock {Camlp4}.
+\newblock Retrieved on 11/07/2011.
+
+\bibitem{MightPOPL11}
+T.~Prabhu, S.~Ramalingam, M.~Might, and M.~W. Hall.
+\newblock Eigencfa: accelerating flow analysis with {GPU}s.
+\newblock In {\em POPL}, 2011.
+
+\bibitem{Sereni05terminationanalysis}
+D.~Sereni.
+\newblock {\em {Termination Analysis of Higher-Order Functional Programs}}.
+\newblock PhD thesis, {University of Oxford}, 2006.
+
+\bibitem{SereniICFP07}
+D.~Sereni.
+\newblock Termination analysis and call graph construction for higher-order
+  functional programs.
+\newblock In {\em ICFP}, 2007.
+
+\bibitem{SereniAPLAS05}
+D.~Sereni and N.~D. Jones.
+\newblock Termination analysis of higher-order functional programs.
+\newblock In {\em APLAS}, 2005.
+
+\bibitem{Shivers88}
+O.~Shivers.
+\newblock Control-flow analysis in scheme.
+\newblock In {\em PLDI}, 1988.
+
+\bibitem{Julia}
+F.~Spoto, F.~Mesnard, and {\'E}.~Payet.
+\newblock A termination analyzer for java bytecode based on path-length.
+\newblock {\em ACM Trans. Program. Lang. Syst.}, 32(3), 2010.
+
+\bibitem{TerauchiPOPL10}
+T.~Terauchi.
+\newblock Dependent types from counterexamples.
+\newblock In {\em POPL}, 2010.
+
+\bibitem{freetheorems}
+J.~Voigtl\"{a}nder.
+\newblock Free theorems involving type constructor classes: functional pearl.
+\newblock In {\em ICFP}, 2009.
+
+\bibitem{Wadler95}
+P.~Wadler.
+\newblock Monads for functional programming.
+\newblock In {\em Advanced Functional Programming}, pages 24--52, 1995.
+
+\bibitem{DanaPhd}
+D.~N. Xu.
+\newblock {\em {Static Contract Checking for Haskell}}.
+\newblock PhD thesis, {University of Cambridge}, August 2008.
+
+\end{thebibliography}

@@ -1,0 +1,9 @@
+para: -refinement-int benchmarks/10/input-petri-net-341.pl
+PETRINIZER: The checker for Petri Nets
+[-refinement-int benchmarks/10/input-petri-net-341.pl]
+
+-------------------------------------------
+The petri net satisfies the property!
+-------------------------------------------
+
+

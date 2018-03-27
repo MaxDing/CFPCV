@@ -1,0 +1,9 @@
+para: -refinement-int benchmarks/1000/input-petri-net-491.pl
+PETRINIZER: The checker for Petri Nets
+[-refinement-int benchmarks/1000/input-petri-net-491.pl]
+
+-------------------------------------------
+The petri net may not satisfy the property
+-------------------------------------------
+
+

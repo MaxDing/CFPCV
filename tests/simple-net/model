@@ -1,0 +1,14 @@
+(error "line 14 column 11: invalid function application, arguments missing")
+sat
+(model 
+  (define-fun t2 () Int
+    0)
+  (define-fun t1 () Int
+    0)
+  (define-fun s3 () Int
+    0)
+  (define-fun s2 () Int
+    0)
+  (define-fun s1 () Int
+    1)
+)

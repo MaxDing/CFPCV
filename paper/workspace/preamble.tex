@@ -1,0 +1,37 @@
+\usepackage{ifthen}
+\usepackage{mathtools} % Instead of amsmath
+\usepackage{amssymb}
+\usepackage[usenames,dvipsnames]{color}
+\usepackage{listings}
+\usepackage{graphicx}
+\usepackage{algpseudocode}
+
+\newcommand{\bfc}{{\sc Bfc}}
+\newcommand{\mist}{{\sc Mist}}
+\newcommand{\iic}{{\sc IIC}}
+\newcommand{\pnerf}{{\sc Pnerf}}
+\newcommand{\zthree}{{\sc Z3}}
+
+\newcommand{\safety}{{\bf Safety}}
+\newcommand{\safetyref}{{\bf Safety by Refinement}}
+
+\newcommand{\ttt}[1]{\texttt{#1}}
+
+\newcommand{\pre}[1]{\prescript{\bullet}{}{#1}}
+\newcommand{\post}[1]{#1^{\bullet}}
+
+\usepackage{tikz}
+\usetikzlibrary{arrows,shapes,shapes.multipart,shapes.geometric,
+	snakes,automata,backgrounds,petri,calc,positioning}
+
+\tikzstyle{place}=[circle,thick,draw=black!75,fill=white!20,
+  	minimum size=5mm]
+\tikzstyle{transition}=[rectangle,thick,draw=black!75,
+  	fill=black!20,minimum size=5mm]
+\tikzstyle{box}=[fill=black!5, draw=black!75]
+\tikzstyle{flow}=[draw, ->, >=stealth]
+
+\tikzstyle{state}=[draw, ellipse, aspect=2]
+\tikzstyle{action}=[draw, rectangle, align=center]
+\tikzstyle{decision}=[draw, diamond, aspect=2, align=center]
+\tikzstyle{print}=[draw, trapezium, trapezium left angle=70, trapezium right angle=-70]

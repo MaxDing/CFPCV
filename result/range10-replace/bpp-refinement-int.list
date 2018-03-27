@@ -1,0 +1,6 @@
+negative 0.32 benchmarks/10-replace/input-petri-net-1.pl
+negative 0.28 benchmarks/10-replace/input-petri-net-2.pl
+negative 0.28 benchmarks/10-replace/input-petri-net-3.pl
+negative 0.27 benchmarks/10-replace/input-petri-net-4.pl
+negative 0.26 benchmarks/10-replace/input-petri-net-5.pl
+negative 0.32 benchmarks/10-replace/input-petri-net-6.pl

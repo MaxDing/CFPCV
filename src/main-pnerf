@@ -1,0 +1,430 @@
+#!/bin/bash
+
+# **********************************************************************
+# Preamble
+
+function absolute_path {
+    (cd "$(dirname "$1")" && pwd)
+}   #get the absolute path of $1 file
+
+function print_title {
+    cat <<EOF
+PETRINIZER: The checker for Petri Nets
+[$1]
+EOF
+}
+
+function print_usage {
+    cat <<EOF
+
+Usage: $0 [options] input_file
+Option list:
+ -safety | --safety                   : Method Safety, default
+ -safety-int | --safety-int           : Method Safety over integers
+ -refinement | --refinement           : Method Safety by Refinement over Real
+ -refinement-int | --refinement-int   : Method Safety by Refinement over integers
+ -invariant | --invariant             : Method Invariant
+ -inv-min | --inv-min                 : Method Invariant Minimization
+ -inv-ref | --inv-ref                 : Method Invariant by Refinement
+ -inv-ref-min | --inv-reftmin         : Method Invariant by Refinement with Minimization
+ -benchmark | --benchmark             : Print information for benchmark
+ -h | --h | -help | --help            : Prints this help
+ -v | --v                             : Verbose output
+
+EOF
+}
+
+function vecho {
+    if [ -n "$verbose" ]; then
+        echo "$1"
+    fi
+}
+
+
+# **********************************************************************
+# Entry point
+
+# Method Safety default real
+invariant=false
+minimize_invariant=false
+refinement_methods=( )
+equation_type='Real'
+
+benchmark=false
+
+
+echo "para: $@"
+# parse parameters
+for a in $@; do
+    case $a in
+        -h | --h | -help | --help)
+            print_usage
+            exit 0
+            ;;
+        -v | --v)
+            verbose=true
+            ;;
+        -safety | --safety)
+            # Method Safety, see above
+            ;;
+        -safety-int | --safety-int)
+            # Method Safety over integers
+            equation_type='Int'
+            ;;
+        -invariant | --invariant)
+            # Method Invariant
+            invariant=true
+            minimize_invariant=false
+            refinement_methods=( )
+            equation_type='Real'
+            ;;
+        -inv-min | --inv-min)
+            # Method Invariant Minimization
+            invariant=true
+            minimize_invariant=true
+            refinement_methods=( )
+            equation_type='Real'
+            ;;
+        -refinement | --refinement)
+            # Method Safety by Refinement
+            invariant=false
+            refinement_methods=( 'trap' )
+            equation_type='Real'
+            ;;
+        -refinement-int | --refinement-int)
+            # Method Safety by Refinement over integers
+            invariant=false
+            minimize_invariant=false
+            refinement_methods=( 'trap' )
+            equation_type='Int'
+            ;;
+        -inv-ref | --inv-ref)
+            # Method Invariant by Refinement
+            invariant=true
+            minimize_invariant=false
+            refinement_methods=( 'trap' )
+            equation_type='Real'
+            ;;
+        -inv-ref-min | --inv-ref-min)
+            # Method Invariant by Refinement with Minimization
+            invariant=true
+            minimize_invariant=true
+            refinement_methods=( 'trap' )
+            equation_type='Real'
+            ;;
+        -benchmark | --benchmark)
+            # Output information for benchmarks
+            benchmark=true
+            ;;
+        -*)
+            echo 'ERROR: Unknown option '$a
+            exit 3
+            ;;
+        *)
+            input=$a
+    esac
+done
+
+if ! $benchmark; then
+  print_title "$*"
+fi
+
+if [ -z $input ]; then
+    echo 'ERROR: No input file was given'
+    exit 3
+fi
+
+if [ ! -e $input ]; then
+    echo "ERROR: The file $input does not exist"
+    exit 3
+fi
+
+sysdir=$(absolute_path $0)
+
+tmpdir=/tmp/pnerf-$(date +%s%N)
+mkdir $tmpdir
+
+set -e
+set -o pipefail
+
+function exit_with {
+  result=$1   #运行结果
+  ref_iter=$2 #refinement迭代次数
+  min_iter=$3 #MinimizeIterations迭代次数
+  inv_size=$4 #invariant包含的place数目
+
+  if $benchmark; then
+    echo -n "Result;"
+    if [[ ${#refinement_methods[@]} -gt 0 ]]; then
+      echo -n "TrapIterations;"
+    fi
+    if $minimize_invariant; then
+      echo -n "MinimizeIterations;"
+    fi
+    if $invariant; then
+      echo -n "InvariantSize;"
+    fi
+     echo -n
+    if [[ $result -eq 0 ]]; then
+      echo -n "+;"
+    else
+      echo -n "-;"
+    fi
+    if [[ ${#refinement_methods[@]} -gt 0 ]]; then
+      echo -n "$ref_iter;"
+    fi
+    if $minimize_invariant; then
+      echo -n "$min_iter;" 
+    fi
+    if $invariant; then
+      echo -n "$inv_size;"
+    fi
+    echo
+  else
+    echo
+    echo '-------------------------------------------'
+    # find the invariants
+    if $invariant; then
+      if [[ $result -eq 0 ]]; then
+        echo "Invariant I for the petri net:"
+        cat $tmpdir/invariant.smt2
+      else
+        echo 'Failed at finding an invariant'
+      fi
+    # check the property
+    else
+      if [[ $result -eq 0 ]]; then
+        echo 'The petri net satisfies the property!'
+      else
+        echo 'The petri net may not satisfy the property'
+      fi
+    fi
+    echo '-------------------------------------------'
+    echo
+    echo
+  fi
+  set +o pipefail
+  set +e
+  rm -r $tmpdir
+  exit $result
+}
+
+function run_z3 {
+  z3_input=$1
+  z3_output=$2
+  if [ -z "$verbose" ]; then
+    z3 -smt2 $z3_input 2>/dev/null >$z3_output
+    res=$?
+  else
+    z3 -smt2 $z3_input 2>/dev/null | tee $z3_output
+    res=$?
+  fi
+  return $res
+}
+
+function run_sicstus {
+  prolog_file=$1
+  pl_output=$2
+  pl_input=${@:3}
+  if [ -z "$verbose" ]; then
+    sicstus -l "$sysdir"/$prolog_file -- $pl_input 2>/dev/null >$pl_output
+    res=$?
+  else
+    sicstus -l "$sysdir"/$prolog_file -- $pl_input 2>/dev/null | tee $pl_output
+    res=$?
+  fi
+  return $res
+}
+
+function run_bash {
+  bash_file=$1
+  bash_output=$2
+  bash_input=${@:3}
+  if [ -z "$verbose" ]; then
+    $bash_file $bash_input >$bash_output
+    res=$?
+  else
+    $bash_file $bash_input | tee $bash_output
+    res=$?
+  fi
+  return $res
+}
+
+# #invariant=false
+# invariant=true
+
+# #refinement_methods=( 'trap' 'empty-trap' 'subnet-trap' )
+# #refinement_methods=( 'trap' 'empty-trap' )
+# #refinement_methods=( 'subnet-trap' )
+# #refinement_methods=( )
+# refinement_methods=( 'trap' )
+# #equation_type='Int'
+# equation_type='Real'
+
+cp $(absolute_path $input)/$(basename $input) $tmpdir/input-petri-net.pl
+
+if $invariant; then
+  >$tmpdir/invariant.smt2
+fi
+
+
+#method invariant
+function construct_invariant {
+  refinement_iter=$1
+  trap_places=$2
+  target=1
+  total_iter=0
+  inv_size=0
+  while (
+    vecho
+    vecho "* Constructing petri net N with target $target from input file"
+    run_sicstus input-file-to-petri-net.pl $tmpdir/pp-petri-net.pl $target $tmpdir/input-petri-net.pl
+  ); do
+    vecho
+    vecho "* Constructing constraints C'_0 for petri net N"
+    run_sicstus petri-net-to-prime-constraints.pl $tmpdir/constraints-c-prime.smt2 $tmpdir/pp-petri-net.pl
+    vecho
+    vecho "* Checking SAT(C')"
+    if ( run_z3 $tmpdir/constraints-c-prime.smt2 $tmpdir/model-a-prime.smt2 ); then
+      vecho "- sat, getting model A' for C'"
+      >$tmpdir/minimization-constraints.pl
+      run_bash "$sysdir"/smt2-model-to-prolog-model.sh $tmpdir/model-a-prime.pl $tmpdir/model-a-prime.smt2 
+      if $minimize_invariant; then
+        iter=0
+        while (
+          vecho
+          vecho " * Minimizing invariant in iteration $iter"
+          vecho " - constructing minimization constraints M_$iter"
+          run_sicstus minimization-constraints.pl $tmpdir/constraints-min.smt2 $tmpdir/pp-petri-net.pl $tmpdir/model-a-prime.pl
+          vecho " - constructing constraints C''_$iter"
+          run_bash "$sysdir"/succ-constraints.sh $tmpdir/constraints-c-prime-next.smt2 $tmpdir/constraints-c-prime.smt2 $tmpdir/constraints-min.smt2
+          vecho " - checking SAT(C''_$iter)"
+          run_z3 $tmpdir/constraints-c-prime-next.smt2 $tmpdir/model-a-prime.smt2
+          ); do
+          vecho "- sat, getting model A'' for C''"
+          run_bash "$sysdir"/smt2-model-to-prolog-model.sh $tmpdir/model-a-prime.pl $tmpdir/model-a-prime.smt2 
+          iter=$((iter + 1))
+        done  #每一次迭代sat的model里的非零的place递减
+        total_iter=$((total_iter + iter))
+        vecho " - unsat, found minimal invariant" #unsat,说明已经找到非零的place最少的model
+       else
+           total_iter=$(($total_iter+1))
+      fi
+      vecho " - constructing invariant I for petri net N and model A'_$iter"
+      run_sicstus y-invariant.pl $tmpdir/y-invariant.smt2 $tmpdir/pp-petri-net.pl $tmpdir/model-a-prime.pl
+      y_invariant=$(cat $tmpdir/y-invariant.smt2)
+      #---------------------------------------for  test----------------------------------------
+      file="/home/drj/Petrinizer/pnerf/tests/error_test/y-invariant.smt2"
+      
+       #---------------------------------------for  test----------------------------------------
+      if ( ! grep -xq "$y_invariant" $tmpdir/invariant.smt2 >/dev/null ); then  #如果invariants.smt2中没有这个constraints，则说明此约束有效，并将其加入invariants.smt2
+        echo "$y_invariant" >>$tmpdir/invariant.smt2   # add new invarint to constriants
+        echo "$target" >>$file
+       echo "$y_invariant">>$file
+       echo >>$file
+        if $benchmark; then
+          run_sicstus count-places.pl $tmpdir/num-places 'invariant' $tmpdir/pp-petri-net.pl $tmpdir/model-a-prime.pl
+          num_places=$(cat $tmpdir/num-places)
+          inv_size=$((inv_size + num_places))
+        fi
+       else
+       	echo "$target" >>$file
+       	echo "invariant exist">>$file
+       	echo >>$file
+      fi
+    else
+      exit_with 2 $refinement_iter $total_iter 0        #初始的c'_0约束不满足，就不存在更小的invaraint                       
+    fi
+    target=$((target + 1))  
+  done
+  total_num_places=$((trap_places + inv_size))
+  exit_with 0 $refinement_iter $total_iter $total_num_places
+}
+
+
+
+
+
+
+#method invariant
+
+if [[ $invariant = true && ${#refinement_methods[@]} -eq 0 ]]; then
+  construct_invariant 0 0
+#method refinment
+else
+  vecho
+  vecho '* Constructing petri net N from input file'
+  run_sicstus input-file-to-petri-net.pl $tmpdir/pp-petri-net.pl 0 $tmpdir/input-petri-net.pl
+  vecho
+  vecho '* Constructing constraints C_0 for petri net N'
+  run_sicstus petri-net-to-constraints.pl $tmpdir/constraints-c.smt2 $equation_type $tmpdir/pp-petri-net.pl
+
+  method_count=${#refinement_methods[@]}   #method_count =1
+  iter=0
+  trap_places=0
+  while
+    (
+      vecho
+      vecho "* Iteration $iter"
+      vecho
+      vecho "* Checking SAT(C_$iter)"
+      run_z3 $tmpdir/constraints-c.smt2 $tmpdir/model-a.smt2
+    ); do
+      vecho
+      vecho "- sat, getting model A for C_$iter"
+      run_bash "$sysdir"/smt2-model-to-prolog-model.sh $tmpdir/model-a.pl $tmpdir/model-a.smt2 
+
+      method_index=0
+      while [[ $method_index -lt $method_count ]]; do
+          method=${refinement_methods[$method_index]}
+          vecho
+          vecho "* Applying refinement method '$method'"
+
+          vecho "- constructing $method constraints C_theta for petri net N and model A"
+          run_sicstus refinement-methods/$method-constraints.pl $tmpdir/constraints-ctheta.smt2 $tmpdir/pp-petri-net.pl $tmpdir/model-a.pl
+          vecho '- checking SAT(C_theta)'
+          if ( run_z3 $tmpdir/constraints-ctheta.smt2 $tmpdir/model-atheta.smt2 ); then
+              ####
+              trapfile='/home/drj/BPP/pnerf/tests/trapfile'
+              cat   $input >> $trapfile
+              ####
+              vecho "- sat, getting model A_theta for C_theta"
+              run_bash "$sysdir"/smt2-model-to-prolog-model.sh $tmpdir/model-atheta.pl $tmpdir/model-atheta.smt2 
+
+              vecho "- constructing $method constraint delta for petri net N and model A_theta"
+              run_sicstus refinement-methods/$method-delta-constraint.pl $tmpdir/constraint-delta.smt2 $tmpdir/pp-petri-net.pl $tmpdir/model-atheta.pl
+              if $invarant; then
+                run_sicstus refinement-methods/$method-prolog-delta-constraint.pl $tmpdir/constraint-delta.pl $((iter + 1)) $tmpdir/pp-petri-net.pl $tmpdir/model-atheta.pl
+                if $benchmark; then
+                  run_sicstus count-places.pl $tmpdir/num-places 'trap' $tmpdir/constraint-delta.pl
+                  num_places=$(cat $tmpdir/num-places)
+                  trap_places=$((trap_places + num_places))
+                fi
+                cat $tmpdir/constraint-delta.smt2 >> $tmpdir/invariant.smt2
+                cat $tmpdir/constraint-delta.pl >> $tmpdir/input-petri-net.pl
+              fi
+
+              vecho "- constructing constraints C_$((iter+1)) for C_$iter and delta"
+              run_bash "$sysdir"/succ-constraints.sh $tmpdir/constraints-cn.smt2 $tmpdir/constraints-c.smt2 $tmpdir/constraint-delta.smt2
+              mv $tmpdir/constraints-cn.smt2 $tmpdir/constraints-c.smt2    #change the filename    C=C+delta
+              break
+          else
+              vecho " - unsat"
+              method_index=$((method_index+1))    # !SAT(C_theta),即找不到一个trap使得negP unsat，所以property  P就don't know
+          fi
+          vecho
+      done
+      if [[ $method_index -ge $method_count ]]; then
+          exit_with 2 $iter 0 0          #  !SAT(C_theta)， don't konw
+      fi
+      iter=$((iter+1))
+  done
+  vecho " - unsat"
+
+  if $invariant; then
+    construct_invariant $iter $trap_places
+  else
+    exit_with 0 $iter 0 0
+  fi
+
+fi

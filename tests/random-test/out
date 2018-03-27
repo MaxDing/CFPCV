@@ -1,0 +1,611 @@
+para: -v -refinement-int input-petri-net-145.pl
+PETRINIZER: The checker for Petri Nets
+[-v -refinement-int input-petri-net-145.pl]
+
+* Constructing petri net N from input file
+place(p1, [], []).
+place(p10, [t1], [t3]).
+place(p7, [], [t4,t2]).
+place(p2, [t4,t3], [t5]).
+place(p6, [t8,t7,t3,t1], []).
+place(p5, [t8,t6,t5,t4], [t1]).
+place(p8, [t8,t5,t2], []).
+place(p4, [t8,t5,t4,t3], [t9,t6]).
+place(p9, [t9,t4], [t7]).
+place(p3, [t9,t6,t5,t4], [t8]).
+
+transition(t1, [p5], [p6,p10]).
+transition(t2, [p7], [p8]).
+transition(t3, [p10], [p6,p2,p4]).
+transition(t4, [p7], [p9,p5,p2,p3,p4]).
+transition(t5, [p2], [p4,p5,p8,p3]).
+transition(t6, [p4], [p3,p5]).
+transition(t7, [p9], [p6]).
+transition(t8, [p3], [p4,p6,p5,p8]).
+transition(t9, [p4], [p9,p3]).
+
+weight(p5, t1, 1).
+weight(t1, p6, 1).
+weight(t1, p10, 1).
+weight(p7, t2, 1).
+weight(t2, p8, 1).
+weight(p10, t3, 1).
+weight(t3, p6, 1).
+weight(t3, p2, 1).
+weight(t3, p4, 1).
+weight(p7, t4, 1).
+weight(t4, p9, 1).
+weight(t4, p5, 1).
+weight(t4, p2, 1).
+weight(t4, p3, 1).
+weight(t4, p4, 1).
+weight(p2, t5, 1).
+weight(t5, p4, 1).
+weight(t5, p5, 1).
+weight(t5, p8, 1).
+weight(t5, p3, 1).
+weight(p4, t6, 1).
+weight(t6, p3, 1).
+weight(t6, p5, 1).
+weight(p9, t7, 1).
+weight(t7, p6, 1).
+weight(p3, t8, 1).
+weight(t8, p4, 1).
+weight(t8, p6, 1).
+weight(t8, p5, 1).
+weight(t8, p8, 1).
+weight(p4, t9, 1).
+weight(t9, p9, 1).
+weight(t9, p3, 1).
+
+init(p7, 1).
+
+target([([p3],3),([p2,p8],2)]).
+
+
+* Constructing constraints C_0 for petri net N
+(declare-fun p1 () Int)
+(declare-fun p10 () Int)
+(declare-fun p7 () Int)
+(declare-fun p2 () Int)
+(declare-fun p6 () Int)
+(declare-fun p5 () Int)
+(declare-fun p8 () Int)
+(declare-fun p4 () Int)
+(declare-fun p9 () Int)
+(declare-fun p3 () Int)
+(declare-fun t1 () Int)
+(declare-fun t2 () Int)
+(declare-fun t3 () Int)
+(declare-fun t4 () Int)
+(declare-fun t5 () Int)
+(declare-fun t6 () Int)
+(declare-fun t7 () Int)
+(declare-fun t8 () Int)
+(declare-fun t9 () Int)
+(assert (>= p1 0))
+(assert (>= p10 0))
+(assert (>= p7 0))
+(assert (>= p2 0))
+(assert (>= p6 0))
+(assert (>= p5 0))
+(assert (>= p8 0))
+(assert (>= p4 0))
+(assert (>= p9 0))
+(assert (>= p3 0))
+(assert (>= t1 0))
+(assert (>= t2 0))
+(assert (>= t3 0))
+(assert (>= t4 0))
+(assert (>= t5 0))
+(assert (>= t6 0))
+(assert (>= t7 0))
+(assert (>= t8 0))
+(assert (>= t9 0))
+(assert (= p1 (+ 0)))
+(assert (= p10 (+ 0 t1 (- t3))))
+(assert (= p7 (+ 1 (- t2) (- t4))))
+(assert (= p2 (+ 0 t3 t4 (- t5))))
+(assert (= p6 (+ 0 t1 t3 t7 t8)))
+(assert (= p5 (+ 0 (- t1) t4 t5 t6 t8)))
+(assert (= p8 (+ 0 t2 t5 t8)))
+(assert (= p4 (+ 0 t3 t4 t5 (- t6) t8 (- t9))))
+(assert (= p9 (+ 0 t4 (- t7) t9)))
+(assert (= p3 (+ 0 t4 t5 t6 (- t8) t9)))
+(assert (or (> t4 0) (> t2 0)))
+(assert (or (and (>= p3 3) (>= (+ p2 p8) 2))))
+(check-sat)
+(get-model)
+
+* Iteration 1
+
+* Checking SAT(C_1)
+sat
+(model 
+  (define-fun t5 () Int
+    0)
+  (define-fun t2 () Int
+    1)
+  (define-fun t7 () Int
+    0)
+  (define-fun t4 () Int
+    0)
+  (define-fun t9 () Int
+    0)
+  (define-fun t8 () Int
+    0)
+  (define-fun t6 () Int
+    3)
+  (define-fun t1 () Int
+    3)
+  (define-fun t3 () Int
+    3)
+  (define-fun p3 () Int
+    3)
+  (define-fun p9 () Int
+    0)
+  (define-fun p4 () Int
+    0)
+  (define-fun p8 () Int
+    1)
+  (define-fun p5 () Int
+    0)
+  (define-fun p6 () Int
+    6)
+  (define-fun p2 () Int
+    3)
+  (define-fun p7 () Int
+    0)
+  (define-fun p10 () Int
+    0)
+  (define-fun p1 () Int
+    0)
+)
+
+- sat, getting model A for C_1
+assignment('t5', 0).
+assignment('t2', 1).
+assignment('t7', 0).
+assignment('t4', 0).
+assignment('t9', 0).
+assignment('t8', 0).
+assignment('t6', 3).
+assignment('t1', 3).
+assignment('t3', 3).
+assignment('p3', 3).
+assignment('p9', 0).
+assignment('p4', 0).
+assignment('p8', 1).
+assignment('p5', 0).
+assignment('p6', 6).
+assignment('p2', 3).
+assignment('p7', 0).
+assignment('p10', 0).
+assignment('p1', 0).
+- generate subnet_1 for A and C_1
+place(p10, [t1], [t3]).
+place(p7, [], [t4,t2]).
+place(p2, [t4,t3], [t5]).
+place(p6, [t8,t7,t3,t1], []).
+place(p5, [t8,t6,t5,t4], [t1]).
+place(p8, [t8,t5,t2], []).
+place(p4, [t8,t5,t4,t3], [t9,t6]).
+place(p3, [t9,t6,t5,t4], [t8]).
+
+transition(t1, [p5], [p6,p10]).
+transition(t2, [p7], [p8]).
+transition(t3, [p10], [p6,p2,p4]).
+transition(t6, [p4], [p3,p5]).
+
+init(p7, 1).
+
+check markable of  subnet_1 for A and C_1
+unmarkable
+- constructing subnet constraint sn_delta for petri net N and model A
+(assert (not (and (> t1 0) (> t2 0) (> t3 0) (= t4 0) (= t5 0) (> t6 0) (= t7 0) (= t8 0) (= t9 0) )))
+- constructing constraints C_2 for C_1 and sn_delta
+(declare-fun p1 () Int)
+(declare-fun p10 () Int)
+(declare-fun p7 () Int)
+(declare-fun p2 () Int)
+(declare-fun p6 () Int)
+(declare-fun p5 () Int)
+(declare-fun p8 () Int)
+(declare-fun p4 () Int)
+(declare-fun p9 () Int)
+(declare-fun p3 () Int)
+(declare-fun t1 () Int)
+(declare-fun t2 () Int)
+(declare-fun t3 () Int)
+(declare-fun t4 () Int)
+(declare-fun t5 () Int)
+(declare-fun t6 () Int)
+(declare-fun t7 () Int)
+(declare-fun t8 () Int)
+(declare-fun t9 () Int)
+(assert (>= p1 0))
+(assert (>= p10 0))
+(assert (>= p7 0))
+(assert (>= p2 0))
+(assert (>= p6 0))
+(assert (>= p5 0))
+(assert (>= p8 0))
+(assert (>= p4 0))
+(assert (>= p9 0))
+(assert (>= p3 0))
+(assert (>= t1 0))
+(assert (>= t2 0))
+(assert (>= t3 0))
+(assert (>= t4 0))
+(assert (>= t5 0))
+(assert (>= t6 0))
+(assert (>= t7 0))
+(assert (>= t8 0))
+(assert (>= t9 0))
+(assert (= p1 (+ 0)))
+(assert (= p10 (+ 0 t1 (- t3))))
+(assert (= p7 (+ 1 (- t2) (- t4))))
+(assert (= p2 (+ 0 t3 t4 (- t5))))
+(assert (= p6 (+ 0 t1 t3 t7 t8)))
+(assert (= p5 (+ 0 (- t1) t4 t5 t6 t8)))
+(assert (= p8 (+ 0 t2 t5 t8)))
+(assert (= p4 (+ 0 t3 t4 t5 (- t6) t8 (- t9))))
+(assert (= p9 (+ 0 t4 (- t7) t9)))
+(assert (= p3 (+ 0 t4 t5 t6 (- t8) t9)))
+(assert (or (> t4 0) (> t2 0)))
+(assert (or (and (>= p3 3) (>= (+ p2 p8) 2))))
+(assert (not (and (> t1 0) (> t2 0) (> t3 0) (= t4 0) (= t5 0) (> t6 0) (= t7 0) (= t8 0) (= t9 0) )))
+(check-sat)
+(get-model)
+- constructing trap constraints C_theta for petri net N and model A
+(declare-fun p1 () Bool)
+(declare-fun p10 () Bool)
+(declare-fun p7 () Bool)
+(declare-fun p2 () Bool)
+(declare-fun p6 () Bool)
+(declare-fun p5 () Bool)
+(declare-fun p8 () Bool)
+(declare-fun p4 () Bool)
+(declare-fun p9 () Bool)
+(declare-fun p3 () Bool)
+
+(declare-fun o_t1 () Bool)
+(declare-fun o_t2 () Bool)
+(declare-fun o_t3 () Bool)
+(declare-fun o_t4 () Bool)
+(declare-fun o_t5 () Bool)
+(declare-fun o_t6 () Bool)
+(declare-fun o_t7 () Bool)
+(declare-fun o_t8 () Bool)
+(declare-fun o_t9 () Bool)
+
+(assert (implies p1 true))
+(assert (implies p10 o_t3))
+(assert (implies p7 (and o_t4 o_t2)))
+(assert (implies p2 o_t5))
+(assert (implies p6 true))
+(assert (implies p5 o_t1))
+(assert (implies p8 true))
+(assert (implies p4 (and o_t9 o_t6)))
+(assert (implies p9 o_t7))
+(assert (implies p3 o_t8))
+
+(assert (implies o_t1 (or p6 p10)))
+(assert (implies o_t2 p8))
+(assert (implies o_t3 (or p6 p2 p4)))
+(assert (implies o_t4 (or p9 p5 p2 p3 p4)))
+(assert (implies o_t5 (or p4 p5 p8 p3)))
+(assert (implies o_t6 (or p3 p5)))
+(assert (implies o_t7 p6))
+(assert (implies o_t8 (or p4 p6 p5 p8)))
+(assert (implies o_t9 (or p9 p3)))
+
+(assert p7)
+
+(assert (not p3))
+(assert (not p8))
+(assert (not p6))
+(assert (not p2))
+
+(check-sat)
+(get-model)
+unsat
+(error "line 51 column 10: model is not available")
+
+* Iteration 2
+
+* Checking SAT(C_2)
+sat
+(model 
+  (define-fun t5 () Int
+    1)
+  (define-fun t2 () Int
+    1)
+  (define-fun t7 () Int
+    1)
+  (define-fun t4 () Int
+    0)
+  (define-fun t9 () Int
+    1)
+  (define-fun t8 () Int
+    1)
+  (define-fun t6 () Int
+    2)
+  (define-fun t1 () Int
+    1)
+  (define-fun t3 () Int
+    1)
+  (define-fun p3 () Int
+    3)
+  (define-fun p9 () Int
+    0)
+  (define-fun p4 () Int
+    0)
+  (define-fun p8 () Int
+    3)
+  (define-fun p5 () Int
+    3)
+  (define-fun p6 () Int
+    4)
+  (define-fun p2 () Int
+    0)
+  (define-fun p7 () Int
+    0)
+  (define-fun p10 () Int
+    0)
+  (define-fun p1 () Int
+    0)
+)
+
+- sat, getting model A for C_2
+assignment('t5', 1).
+assignment('t2', 1).
+assignment('t7', 1).
+assignment('t4', 0).
+assignment('t9', 1).
+assignment('t8', 1).
+assignment('t6', 2).
+assignment('t1', 1).
+assignment('t3', 1).
+assignment('p3', 3).
+assignment('p9', 0).
+assignment('p4', 0).
+assignment('p8', 3).
+assignment('p5', 3).
+assignment('p6', 4).
+assignment('p2', 0).
+assignment('p7', 0).
+assignment('p10', 0).
+assignment('p1', 0).
+- generate subnet_2 for A and C_2
+place(p10, [t1], [t3]).
+place(p7, [], [t4,t2]).
+place(p2, [t4,t3], [t5]).
+place(p6, [t8,t7,t3,t1], []).
+place(p5, [t8,t6,t5,t4], [t1]).
+place(p8, [t8,t5,t2], []).
+place(p4, [t8,t5,t4,t3], [t9,t6]).
+place(p9, [t9,t4], [t7]).
+place(p3, [t9,t6,t5,t4], [t8]).
+
+transition(t1, [p5], [p6,p10]).
+transition(t2, [p7], [p8]).
+transition(t3, [p10], [p6,p2,p4]).
+transition(t5, [p2], [p4,p5,p8,p3]).
+transition(t6, [p4], [p3,p5]).
+transition(t7, [p9], [p6]).
+transition(t8, [p3], [p4,p6,p5,p8]).
+transition(t9, [p4], [p9,p3]).
+
+init(p7, 1).
+
+check markable of  subnet_2 for A and C_2
+unmarkable
+- constructing subnet constraint sn_delta for petri net N and model A
+(assert (not (and (> t1 0) (> t2 0) (> t3 0) (= t4 0) (> t5 0) (> t6 0) (> t7 0) (> t8 0) (> t9 0) )))
+- constructing constraints C_3 for C_2 and sn_delta
+(declare-fun p1 () Int)
+(declare-fun p10 () Int)
+(declare-fun p7 () Int)
+(declare-fun p2 () Int)
+(declare-fun p6 () Int)
+(declare-fun p5 () Int)
+(declare-fun p8 () Int)
+(declare-fun p4 () Int)
+(declare-fun p9 () Int)
+(declare-fun p3 () Int)
+(declare-fun t1 () Int)
+(declare-fun t2 () Int)
+(declare-fun t3 () Int)
+(declare-fun t4 () Int)
+(declare-fun t5 () Int)
+(declare-fun t6 () Int)
+(declare-fun t7 () Int)
+(declare-fun t8 () Int)
+(declare-fun t9 () Int)
+(assert (>= p1 0))
+(assert (>= p10 0))
+(assert (>= p7 0))
+(assert (>= p2 0))
+(assert (>= p6 0))
+(assert (>= p5 0))
+(assert (>= p8 0))
+(assert (>= p4 0))
+(assert (>= p9 0))
+(assert (>= p3 0))
+(assert (>= t1 0))
+(assert (>= t2 0))
+(assert (>= t3 0))
+(assert (>= t4 0))
+(assert (>= t5 0))
+(assert (>= t6 0))
+(assert (>= t7 0))
+(assert (>= t8 0))
+(assert (>= t9 0))
+(assert (= p1 (+ 0)))
+(assert (= p10 (+ 0 t1 (- t3))))
+(assert (= p7 (+ 1 (- t2) (- t4))))
+(assert (= p2 (+ 0 t3 t4 (- t5))))
+(assert (= p6 (+ 0 t1 t3 t7 t8)))
+(assert (= p5 (+ 0 (- t1) t4 t5 t6 t8)))
+(assert (= p8 (+ 0 t2 t5 t8)))
+(assert (= p4 (+ 0 t3 t4 t5 (- t6) t8 (- t9))))
+(assert (= p9 (+ 0 t4 (- t7) t9)))
+(assert (= p3 (+ 0 t4 t5 t6 (- t8) t9)))
+(assert (or (> t4 0) (> t2 0)))
+(assert (or (and (>= p3 3) (>= (+ p2 p8) 2))))
+(assert (not (and (> t1 0) (> t2 0) (> t3 0) (= t4 0) (= t5 0) (> t6 0) (= t7 0) (= t8 0) (= t9 0) )))
+(assert (not (and (> t1 0) (> t2 0) (> t3 0) (= t4 0) (> t5 0) (> t6 0) (> t7 0) (> t8 0) (> t9 0) )))
+(check-sat)
+(get-model)
+- constructing trap constraints C_theta for petri net N and model A
+(declare-fun p1 () Bool)
+(declare-fun p10 () Bool)
+(declare-fun p7 () Bool)
+(declare-fun p2 () Bool)
+(declare-fun p6 () Bool)
+(declare-fun p5 () Bool)
+(declare-fun p8 () Bool)
+(declare-fun p4 () Bool)
+(declare-fun p9 () Bool)
+(declare-fun p3 () Bool)
+
+(declare-fun o_t1 () Bool)
+(declare-fun o_t2 () Bool)
+(declare-fun o_t3 () Bool)
+(declare-fun o_t4 () Bool)
+(declare-fun o_t5 () Bool)
+(declare-fun o_t6 () Bool)
+(declare-fun o_t7 () Bool)
+(declare-fun o_t8 () Bool)
+(declare-fun o_t9 () Bool)
+
+(assert (implies p1 true))
+(assert (implies p10 o_t3))
+(assert (implies p7 (and o_t4 o_t2)))
+(assert (implies p2 o_t5))
+(assert (implies p6 true))
+(assert (implies p5 o_t1))
+(assert (implies p8 true))
+(assert (implies p4 (and o_t9 o_t6)))
+(assert (implies p9 o_t7))
+(assert (implies p3 o_t8))
+
+(assert (implies o_t1 (or p6 p10)))
+(assert (implies o_t2 p8))
+(assert (implies o_t3 (or p6 p2 p4)))
+(assert (implies o_t4 (or p9 p5 p2 p3 p4)))
+(assert (implies o_t5 (or p4 p5 p8 p3)))
+(assert (implies o_t6 (or p3 p5)))
+(assert (implies o_t7 p6))
+(assert (implies o_t8 (or p4 p6 p5 p8)))
+(assert (implies o_t9 (or p9 p3)))
+
+(assert p7)
+
+(assert (not p3))
+(assert (not p8))
+(assert (not p5))
+(assert (not p6))
+
+(check-sat)
+(get-model)
+unsat
+(error "line 51 column 10: model is not available")
+
+* Iteration 3
+
+* Checking SAT(C_3)
+sat
+(model 
+  (define-fun t5 () Int
+    1)
+  (define-fun t2 () Int
+    0)
+  (define-fun t7 () Int
+    1)
+  (define-fun t4 () Int
+    1)
+  (define-fun t9 () Int
+    1)
+  (define-fun t8 () Int
+    1)
+  (define-fun t6 () Int
+    1)
+  (define-fun t1 () Int
+    1)
+  (define-fun t3 () Int
+    1)
+  (define-fun p3 () Int
+    3)
+  (define-fun p9 () Int
+    1)
+  (define-fun p4 () Int
+    2)
+  (define-fun p8 () Int
+    2)
+  (define-fun p5 () Int
+    3)
+  (define-fun p6 () Int
+    4)
+  (define-fun p2 () Int
+    1)
+  (define-fun p7 () Int
+    0)
+  (define-fun p10 () Int
+    0)
+  (define-fun p1 () Int
+    0)
+)
+
+- sat, getting model A for C_3
+assignment('t5', 1).
+assignment('t2', 0).
+assignment('t7', 1).
+assignment('t4', 1).
+assignment('t9', 1).
+assignment('t8', 1).
+assignment('t6', 1).
+assignment('t1', 1).
+assignment('t3', 1).
+assignment('p3', 3).
+assignment('p9', 1).
+assignment('p4', 2).
+assignment('p8', 2).
+assignment('p5', 3).
+assignment('p6', 4).
+assignment('p2', 1).
+assignment('p7', 0).
+assignment('p10', 0).
+assignment('p1', 0).
+- generate subnet_3 for A and C_3
+place(p10, [t1], [t3]).
+place(p7, [], [t4,t2]).
+place(p2, [t4,t3], [t5]).
+place(p6, [t8,t7,t3,t1], []).
+place(p5, [t8,t6,t5,t4], [t1]).
+place(p8, [t8,t5,t2], []).
+place(p4, [t8,t5,t4,t3], [t9,t6]).
+place(p9, [t9,t4], [t7]).
+place(p3, [t9,t6,t5,t4], [t8]).
+
+transition(t1, [p5], [p6,p10]).
+transition(t3, [p10], [p6,p2,p4]).
+transition(t4, [p7], [p9,p5,p2,p3,p4]).
+transition(t5, [p2], [p4,p5,p8,p3]).
+transition(t6, [p4], [p3,p5]).
+transition(t7, [p9], [p6]).
+transition(t8, [p3], [p4,p6,p5,p8]).
+transition(t9, [p4], [p9,p3]).
+
+init(p7, 1).
+
+check markable of  subnet_3 for A and C_3
+markable
+subnet_3 markable
+3
+-------------------------------------------
+The petri net do not satisfy the property
+-------------------------------------------
+
+

@@ -1,0 +1,4 @@
+refinement: target = 0 所有target都会通过or连接成一个约束，进行sat
+invaraints：target = N 第N个target的几个target_conj的约束
+
+只需要证明某个target unsat即（当然也会是target组合unsat，但是组合太多，所以invaraints只用一个target）

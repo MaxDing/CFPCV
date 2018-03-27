@@ -1,0 +1,3 @@
+para: -refinement-int benchmarks/10-replace/input-petri-net-6.pl
+PETRINIZER: The checker for Petri Nets
+[-refinement-int benchmarks/10-replace/input-petri-net-6.pl]
