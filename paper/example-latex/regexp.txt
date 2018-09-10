@@ -1,3 +1,0 @@
-\\begin{figure}\(.\|
-\)*?\\caption{\(.*?\):\(.*?\)}\(.\|
-\)*?\\end{figure}
